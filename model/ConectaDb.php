@@ -70,8 +70,14 @@ class ConectaDb {
         return count($this->rs);
     }
 
-    public function closeConnection() {
-        $this->cn . pg_close();
+    // public function closeConnection() {
+    //     $this->cn . pg_close();
+    // }
+    public function closeConnection(): void {
+    if ($this->cn) {
+        pg_close($this->cn);
+        $this->cn = null;
     }
+}
 
 }
