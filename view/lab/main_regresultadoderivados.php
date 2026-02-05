@@ -183,12 +183,53 @@ $lab = new Lab();
                   <input type="file" id="fl_programacion" class="form-control">
                 </div>
 
-                <!-- Botón -->
-                <div class="col-md-2 d-flex align-items-end">
-                  <button id="btn_cargar_excel" type="button" class="btn btn-success w-100">
-                    <i class="fa fa-upload"></i> Cargar Excel
-                  </button>
-                </div
+                 
+
+
+
+
+
+
+<div class="col-md-2 d-flex align-items-end">
+  <button id="btn_insertar" type="button" class="btn btn-success w-100">
+    <i class="fa fa-upload"></i> INSERTAR
+  </button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$('#btn_insertar').click(function() {
+
+  var fileInput = document.getElementById("fl_programacion");
+  if (fileInput.files.length === 0) {
+    alert("Seleccione un archivo Excel primero.");
+    return;
+  }
+
+  var formData = new FormData();
+  formData.append("excel_file", fileInput.files[0]);
+
+  $.ajax({
+    url: "insert_labresultadodet.php",
+    type: "POST",
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function(response) {
+      alert(response);
+    },
+    error: function(xhr, status, error) {
+      alert("Error: " + error);
+    }
+  });
+
+});
+</script>
+
+
+
+
+
                   </div>
             </form>
             <p></p>

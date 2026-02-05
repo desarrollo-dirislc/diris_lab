@@ -261,7 +261,7 @@ inner JOIN public.tbl_dependencia dori ON la.id_dependencia = dori.id_dependenci
 inner JOIN lab.tbl_estado_lab_resultado estresul On env.id_estado_resul = estresul.id
 WHERE dpro.id_dependencia = " . $param[0]['id_dependencia']  . " AND dpro.id_producto = " . $param[0]['id_producto'];
 if (!empty($param[0]['id_dependencia_origen'])) {
-	$this->sql .= " AND la.id_dependencia = " . $param[0]['id_dependencia_origen'];
+	$this->sql .= " AND la.id_dependencia = " . $param[0]['id_dependencia_origen'];                                                                
 }
 
 
