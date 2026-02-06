@@ -64,7 +64,7 @@ if (empty($resultados)) {
 
 // -------------------- PREPARAR INSERTS --------------------
 
-// 1️⃣ Insert en tbl_labresultado
+//  Insert en tbl_labresultado
 $sqlInsertResultado = "
 INSERT INTO lab.tbl_labresultado (
     id_atencion,
@@ -93,7 +93,7 @@ RETURNING id
 ";
 $stmtInsertResultado = $pdo->prepare($sqlInsertResultado);
 
-// 2️⃣ Primer insert en tbl_labresultadodet
+//  Primer insert en tbl_labresultadodet
 $sqlInsert1 = "
 INSERT INTO lab.tbl_labresultadodet (
     id_atencion,
@@ -131,7 +131,7 @@ INSERT INTO lab.tbl_labresultadodet (
 )";
 $stmtInsert1 = $pdo->prepare($sqlInsert1);
 
-// 3️⃣ Segundo insert en tbl_labresultadodet
+//  Segundo insert en tbl_labresultadodet
 $sqlInsert2 = "
 INSERT INTO lab.tbl_labresultadodet (
     id_atencion,
@@ -169,7 +169,7 @@ INSERT INTO lab.tbl_labresultadodet (
 )";
 $stmtInsert2 = $pdo->prepare($sqlInsert2);
 
-// 4️⃣ UPDATE a tbl_labproductoatencion (SEGÚN id_atencion)
+//  UPDATE a tbl_labproductoatencion (SEGÚN id_atencion)
 $sqlUpdateAtencion = "
 UPDATE lab.tbl_labproductoatencion
 SET id_estado_resul = 2
@@ -182,7 +182,7 @@ $insertados = 0;
 
 foreach ($rows as $fila) {
 
-    // 📌 NUEVAS COLUMNAS DEL EXCEL (según lo que me indicaste)
+    //  NUEVAS COLUMNAS DEL EXCEL (según lo que me indicaste)
     $dependencia_excel = trim($fila[2]);   // C → Categoría
     $dni_excel = trim($fila[10]);          // K → Identificación
     $fecha_excel_raw = trim($fila[23]);    // X → Fechas toma muestras
@@ -218,7 +218,7 @@ foreach ($rows as $fila) {
         $dependencia_bd = trim($rowDB['dependencia_origen']);
         $fecha_bd = trim($rowDB['fecha_toma_muestra']); // ya viene como DD/MM/YYYY
 
-        // 🔍 COMPARACIÓN FINAL (independiente del formato de fecha original)
+        // COMPARACIÓN FINAL (independiente del formato de fecha original)
         if (
     $dni_excel == $dni_bd &&
     $dependencia_excel == $dependencia_bd
@@ -226,25 +226,25 @@ foreach ($rows as $fila) {
 
             $id_atencion = $rowDB['id_atencion'];
 
-            // 1️⃣ Insert en tbl_labresultado (captura id generado)
+            // 1️ Insert en tbl_labresultado (captura id generado)
             $stmtInsertResultado->execute([':id_atencion' => $id_atencion]);
             $id_resultado = $stmtInsertResultado->fetchColumn();
 
-            // 2️⃣ Primer insert detalle (usa resultado del Excel)
+            // 2️ Primer insert detalle (usa resultado del Excel)
             $stmtInsert1->execute([
                 ':id_atencion' => $id_atencion,
                 ':id_resultado' => $id_resultado,
                 ':resultado_excel' => $resultado_excel
             ]);
 
-            // 3️⃣ Segundo insert detalle (usa mismo resultado del Excel)
+            // 3️ Segundo insert detalle (usa mismo resultado del Excel)
             $stmtInsert2->execute([
                 ':id_atencion' => $id_atencion,
                 ':id_resultado' => $id_resultado
                 
             ]);
 
-            // 4️⃣ UPDATE: marcar atención con estado 2 (usando el mismo id_atencion)
+            // 4️ UPDATE: marcar atención con estado 2 (usando el mismo id_atencion)
             $stmtUpdateAtencion->execute([
                 ':id_atencion' => $id_atencion
             ]);
@@ -255,9 +255,7 @@ foreach ($rows as $fila) {
 }
 
 
- //echo "Proceso finalizado. Inserts realizados: $insertados";
-
-echo "Proceso finalizado cargado correctamente.";
+//echo "Proceso finalizado. Inserts realizados: $insertados";
 
 
- 
+echo "Proceso finalizado. Cargado exitosamente";

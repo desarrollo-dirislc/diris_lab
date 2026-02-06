@@ -661,7 +661,7 @@ if($frm_origen == "LR"){
 					if (isset($id_estado_ing_resul)) {
 						if($id_estado_ing_resul <> 4) { 
 					?>
-					  <button class="btn btn-primary btn-lg" id="btn-submit-proc" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Espere" data-done-text="<i class='fa fa-save'></i> Guardar" onclick="save_atencion('I')"><i class="fa fa-save"></i> Guardar</button>
+					  <!--<button class="btn btn-primary btn-lg" id="btn-submit-proc" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Espere" data-done-text="<i class='fa fa-save'></i> Guardar" onclick="save_atencion('I')"><i class="fa fa-save"></i> Guardar</button> -->
 					<?php } ?>
 					  <button class="btn btn-success btn-lg" id="btn-submit" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Espere" data-done-text="<i class='fa fa-save'></i> Guardar" onclick="save_atencion('ITV')"><i class="fa fa-save"></i> <i class="fa fa-thumbs-up"></i> Guardar y validar</button>
 					<?php }
