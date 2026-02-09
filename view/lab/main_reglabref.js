@@ -502,7 +502,27 @@ function validForm(acc) {
 	var txtTotalMonto = validateNumber($('#txtTotalMonto').val());
 	var txtDescuentoMonto = validateNumber($('#txtDescuentoMonto').val());
 	var txtPorDescuentoMonto = validateNumber($('#txtPorDescuentoMonto').val());
-  
+
+	// VALIDACIONES PARA LABORATORIO REFERENCIAL
+	var txtValidacionEdad = $('#txtValidacionEdad').val();
+	var txtValidacionSexo = $('#txtValidacionSexo').val();
+	var txtPuedeAtenderse = $('#txtPuedeAtenderse').val();
+
+	if (txtValidacionEdad == "0") {
+		msg += "El paciente debe tener entre 40 y 65 años para este tipo de atención<br/>";
+		sw = false;
+	}
+
+	if (txtValidacionSexo == "0") {
+		msg += "Este examen solo está disponible para pacientes varones<br/>";
+		sw = false;
+	}
+
+	if (txtPuedeAtenderse == "0") {
+		msg += "El paciente tiene un resultado validado hace menos de 1 año. Debe esperar para volver a atenderse<br/>";
+		sw = false;
+	}
+
 	if (txtIdTipDoc == "1") {
 		if (txtNroDocLn != 8) { msg += "Ingrese el Nro. de documento del Paciente correctamente<br/>"; sw = false;}
 	} else {
@@ -540,7 +560,7 @@ function validForm(acc) {
 			if (txtNroTelMovilSoli == "") { msg += "Ingrese el Nro. de Telefono fijo o móvil del apoderado<br/>"; sw = false;}
 		}
 		if (txtIdParenSoli == "") { msg += "Seleccione el PARENTESCO del apoderado con el paciente<br/>"; sw = false;}
-	}	
+	}
 
 	if (txtIdPlanTari == "") { msg += "Seleccione Plan Tarifario<br/>"; sw = false;}
 	if (txtFechaAten == "") { msg += "Ingrese la fecha de atención<br/>"; sw = false;}

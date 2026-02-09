@@ -52,6 +52,12 @@ $labIdServicio = $_SESSION['labIdServicio'];
   <link rel="stylesheet" href="../../assets/plugins/datatables/dataTables.bootstrap.css" type="text/css"/>
   <link rel="stylesheet" href="../../assets/plugins/datatables/extensions/Responsive/css/dataTables.responsive.css" type="text/css"/>
   <script type="text/javascript" language="javascript" src="../../assets/plugins/datatables/jquery.js"></script>
+  <!-- jQuery UI -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
   <script type="text/javascript" language="javascript" src="../../assets/plugins/datatables/jquery.dataTables.js"></script>
   <script type="text/javascript" language="javascript" src="../../assets/plugins/datatables/extensions/Responsive/js/dataTables.responsive.js"></script>
   <script type="text/javascript" language="javascript" src="../../assets/plugins/datatables/dataTables.bootstrap.js"></script>

@@ -162,11 +162,36 @@ switch ($_POST['accion']) {
 		if(trim($rs[0]['nro_hc']) == ""){
 			$nro_hc = "00";
 		} else {
-			$nro_hc = trim($rs[0]['nro_hc']); 
+			$nro_hc = trim($rs[0]['nro_hc']);
 		}
 	} else {
 		$nro_hc = trim($rs[0]['nro_hc']);
 	}
+
+	// VALIDACIONES PARA LABORATORIO REFERENCIAL
+	$edad = trim($rs[0]['edad']);
+	$sexo = $rs[0]['id_sexo'];
+	$validacion_edad = ($edad >= 40 && $edad <= 65) ? 1 : 0;
+	$validacion_sexo = ($sexo == 1) ? 1 : 0; // 1 = Masculino
+
+	// Consultar última atención con resultado validado
+	$rsAten = $p->get_ultimaAtencionConResultadoPorPersona($rs[0]['id_persona'], $labIdDepUser);
+
+	$fecha_ultima_atencion = "";
+	$dias_ultima_atencion = 9999;
+	$tiene_resultado_validado = 0;
+	$puede_atenderse = 1;
+
+	if(count($rsAten) > 0 && $rsAten[0]['tiene_resultado'] > 0){
+		$fecha_ultima_atencion = $rsAten[0]['fecha_ultima_atencion'];
+		$dias_ultima_atencion = $rsAten[0]['dias_desde_ultima_atencion'];
+		$tiene_resultado_validado = 1;
+		// Si tiene resultado validado y han pasado menos de 365 días (1 año), NO puede atenderse
+		if($dias_ultima_atencion < 365){
+			$puede_atenderse = 0;
+		}
+	}
+
     $datos = array(
       0 => $rs[0]['id_persona'],
       1 => $rs[0]['id_tipodoc'],
@@ -191,7 +216,13 @@ switch ($_POST['accion']) {
       20 => trim($rs[0]['edad']),
       21 => trim($rs[0]['id_paisnac']),
       22 => trim($rs[0]['id_etnia']),
-	  23 => 'SISTEMA'
+	  23 => 'SISTEMA',
+	  24 => $fecha_ultima_atencion,
+	  25 => $dias_ultima_atencion,
+	  26 => $tiene_resultado_validado,
+	  27 => $validacion_edad,
+	  28 => $validacion_sexo,
+	  29 => $puede_atenderse
     );
     echo json_encode($datos);
   } else {

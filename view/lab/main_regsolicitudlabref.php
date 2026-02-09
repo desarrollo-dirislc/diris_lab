@@ -104,6 +104,9 @@ $ta = new Tarifa();
         <input type="hidden" name="txtShowOptPrint" id="txtShowOptPrint" value=""/>
         <input type="hidden" name="txtIdPer" id="txtIdPer" value="0"/>
         <input type="hidden" name="txtIdSoli" id="txtIdSoli" value="0"/>
+        <input type="hidden" name="txtValidacionEdad" id="txtValidacionEdad" value="1"/>
+        <input type="hidden" name="txtValidacionSexo" id="txtValidacionSexo" value="1"/>
+        <input type="hidden" name="txtPuedeAtenderse" id="txtPuedeAtenderse" value="1"/>
 		<b>Los datos con <span class="text-danger">(*)</span> son obligatorios.</b>
         <div class="row">
           <div class="col-sm-5">
@@ -200,7 +203,9 @@ $ta = new Tarifa();
 					</div>
 				  </div>
 				  </div>
-				
+				</div>
+				<!-- FIN de div con display:none -->
+
 				<div class="row">
 				  <div class="form-group col-sm-12 col-md-3">
                     <label for="txtIdServicio">Servicio de procedencia:</label>

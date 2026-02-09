@@ -43,4 +43,19 @@ class Persona {
     $this->db->closeConnection();
     return $this->rs;
   }
+
+  public function get_ultimaAtencionConResultadoPorPersona($idPersona, $idDep) {
+    $conet = $this->db->getConnection();
+    $this->sql = "SELECT
+                    MAX(fec_atencion) as fecha_ultima_atencion,
+                    CURRENT_DATE - MAX(fec_atencion)::date as dias_desde_ultima_atencion,
+                    COUNT(*) as tiene_resultado
+                  FROM lab.tbl_labatencion
+                  WHERE id_paciente = '" . $idPersona . "'
+                    AND id_dependencia = '" . $idDep . "'
+                    AND id_estado_resul = 4";
+    $this->rs = $this->db->query($this->sql);
+    $this->db->closeConnection();
+    return $this->rs;
+  }
 }

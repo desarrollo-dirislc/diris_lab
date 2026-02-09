@@ -61,6 +61,91 @@ $lab = new Lab();
     line-height: 14px !important;
     font-size: 10px !important;
   }
+
+  /* Estilos modernos para input file y botón de carga */
+  .upload-section {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    margin-top: 15px;
+    max-width: 600px;
+  }
+
+  .upload-file-wrapper {
+    flex: 1;
+  }
+
+  .upload-file-wrapper label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .custom-file-input {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .custom-file-input input[type="file"] {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .custom-file-input input[type="file"]:hover {
+    border-color: #5cb85c;
+    background-color: #f8fff8;
+  }
+
+  .custom-file-input input[type="file"]:focus {
+    outline: none;
+    border-color: #5cb85c;
+    box-shadow: 0 0 0 3px rgba(92, 184, 92, 0.1);
+  }
+
+  .upload-btn-wrapper {
+    flex: 0 0 180px;
+  }
+
+  .btn-upload-modern {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #5cb85c 0%, #4cae4c 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .btn-upload-modern:hover {
+    background: linear-gradient(135deg, #4cae4c 0%, #449d44 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .btn-upload-modern:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-upload-modern i {
+    font-size: 16px;
+  }
 </style>
 <div class="container-fluid">
   <div class="panel-prime">
@@ -178,15 +263,21 @@ $lab = new Lab();
                   <label>&nbsp;</label>
                   <button type="button" class="btn btn-warning btn-sm btn-block" id="btn_bus_adecuadas_reset">Restablecer filtros</button>
                 </div>
-                <div class="col-md-4">
-                  <label for="fl_programacion" class="form-label">Archivo Excel</label>
-                  <input type="file" id="fl_programacion" class="form-control">
-                </div>
-
-                <div class="col-md-2 d-flex align-items-end"><br>
-                  <button id="btn_insertar" type="button" class="btn btn-success w-100">
-                    <i class="fa fa-upload"></i> Cargar excel
-                  </button>
+                <div class="col-md-12">
+                  <div class="upload-section">
+                    <div class="upload-file-wrapper">
+                      <label for="fl_programacion">Archivo Excel</label>
+                      <div class="custom-file-input">
+                        <input type="file" id="fl_programacion" accept=".xlsx,.xls">
+                      </div>
+                    </div>
+                    <div class="upload-btn-wrapper">
+                      <button id="btn_insertar" type="button" class="btn-upload-modern">
+                        <i class="fa fa-upload"></i>
+                        <span>Cargar Excel</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <script>
