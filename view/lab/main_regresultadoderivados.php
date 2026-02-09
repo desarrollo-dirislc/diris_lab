@@ -183,100 +183,84 @@ $lab = new Lab();
                   <input type="file" id="fl_programacion" class="form-control">
                 </div>
 
-                 
+                <div class="col-md-2 d-flex align-items-end"><br>
+                  <button id="btn_insertar" type="button" class="btn btn-success w-100">
+                    <i class="fa fa-upload"></i> Cargar excel
+                  </button>
+                </div>
+
+                <script>
+                  $('#btn_insertar').click(function() {
+
+                    var fileInput = document.getElementById("fl_programacion");
+                    if (fileInput.files.length === 0) {
+                      alert("Seleccione un archivo Excel primero.");
+                      return;
+                    }
+
+                    var formData = new FormData();
+                    formData.append("excel_file", fileInput.files[0]);
+
+                    // Mostrar spinner
+                    document.getElementById("overlay-carga").style.display = "flex";
+
+                    $.ajax({
+                      url: "insert_labresultadodet.php",
+                      type: "POST",
+                      data: formData,
+                      contentType: false,
+                      processData: false,
+
+                      success: function(response) {
+
+                        // Ocultar y eliminar overlay (MUY IMPORTANTE)
+                        let overlay = document.getElementById("overlay-carga");
+                        if (overlay) {
+                          overlay.style.display = "none";
+                          overlay.remove();
+                        }
+
+                        alert(response);
+
+                        // Recargar página
+                        setTimeout(function() {
+                          window.location.reload();
+                        }, 200);
+                      },
+
+                      error: function(xhr, status, error) {
+
+                        // También ocultar overlay si hay error
+                        document.getElementById("overlay-carga").style.display = "none";
+
+                        alert("Error: " + error);
+                      }
+                    });
+
+                  });
+                </script>
 
 
-
-
-
-
-<div class="col-md-2 d-flex align-items-end"><br>
-  <button id="btn_insertar" type="button" class="btn btn-success w-100">
-    <i class="fa fa-upload"></i> Cargar excel
-  </button>
-</div>
-
-<script>
-$('#btn_insertar').click(function() {
-
-  var fileInput = document.getElementById("fl_programacion");
-  if (fileInput.files.length === 0) {
-    alert("Seleccione un archivo Excel primero.");
-    return;
-  }
-
-  var formData = new FormData();
-  formData.append("excel_file", fileInput.files[0]);
-
-  // Mostrar spinner
-  document.getElementById("overlay-carga").style.display = "flex";
-
-  $.ajax({
-    url: "insert_labresultadodet.php",
-    type: "POST",
-    data: formData,
-    contentType: false,
-    processData: false,
-
-    success: function(response) {
-
-      // Ocultar y eliminar overlay (MUY IMPORTANTE)
-      let overlay = document.getElementById("overlay-carga");
-      if (overlay) {
-        overlay.style.display = "none";
-        overlay.remove();
-      }
-
-      alert(response);
-
-      // Recargar página
-      setTimeout(function(){
-        window.location.reload();
-      }, 200);
-    },
-
-    error: function(xhr, status, error) {
-
-      // También ocultar overlay si hay error
-      document.getElementById("overlay-carga").style.display = "none";
-
-      alert("Error: " + error);
-    }
-  });
-
-});
-</script>
-
-
-<!-- SPINNER + BLOQUEO DE PANTALLA -->
-<div id="overlay-carga" style="
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-">
-    <div style="background:white; padding:20px; border-radius:10px;">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p style="margin-top:10px;">Procesando... por favor espere</p>
-    </div>
-</div>
-
-
- 
-
-
-
-
-
-
-                  </div>
+                <!-- SPINNER + BLOQUEO DE PANTALLA -->
+                <div id="overlay-carga" style="
+                      display: none;
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      width: 100%;
+                      height: 100%;
+                      background: rgba(0,0,0,0.5);
+                      z-index: 9999;
+                      align-items: center;
+                      justify-content: center;
+                      text-align: center;
+                  ">
+                    <div style="background:white; padding:20px; border-radius:10px;">
+                      <div class="spinner-border text-primary" role="status"></div>
+                      <p style="margin-top:10px;">Procesando... por favor espere</p>
+                    </div>
+                </div>
+              </div>
             </form>
             <p></p>
             <table id="tbl_enproceso" class="table table-hover table-bordered" cellspacing="0" width="100%">
@@ -1340,10 +1324,3 @@ $('#btn_insertar').click(function() {
     });
   </script>
   <?php require_once '../include/masterfooter.php'; ?>
-
-
-
-
-
-
- 
