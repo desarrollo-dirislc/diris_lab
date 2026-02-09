@@ -176,7 +176,7 @@ $ta = new Tarifa();
 				</div>
 				<div class="row">
 				  <div class="form-group col-sm-12 col-md-3">
-                    <label for="txtIdServicio">Servicio de procedencia:</label>
+                    <label for="txtIdServicio">Servicio de procedencia<span class="text-danger">(*)</span>:</label>
                     <select class="form-control input-sm" style="width: 100%" name="txtIdServicio" id="txtIdServicio" onkeydown="campoSiguiente('txtDirPac', event);" disabled>
                       <option value="" selected>-- Seleccione --</option>
                       <?php
@@ -188,7 +188,7 @@ $ta = new Tarifa();
                     </select>
                   </div>
 				  <div class="form-group col-sm-6 col-md-6">
-                    <label for="txtNombreMedico">Nombre(s) del médico:</label>
+                    <label for="txtNombreMedico">Nombre(s) del médico<span class="text-danger">(*)</span>:</label>
                     <input type="text" name="txtNombreMedico" id="txtNombreMedico" class="form-control input-sm text-uppercase" maxlength="170" value="" disabled/>
 					<span class="help-block">Ingrese primero los apellidos luego los nombres</span>
                   </div>
