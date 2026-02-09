@@ -125,41 +125,41 @@ function buscar_datos_personales(origen){
 		}
 
 		// VALIDACIONES PARA LABORATORIO REFERENCIAL
-		var validacion_edad = datos[27]; // 1 = cumple (40-65 años), 0 = no cumple
-		var validacion_sexo = datos[28]; // 1 = cumple (masculino), 0 = no cumple
-		var puede_atenderse = datos[29]; // 1 = puede, 0 = no puede (tiene resultado < 1 año)
-		var dias_ultima_atencion = datos[25];
+		// var validacion_edad = datos[27]; // 1 = cumple (40-65 años), 0 = no cumple
+		// var validacion_sexo = datos[28]; // 1 = cumple (masculino), 0 = no cumple
+		// var puede_atenderse = datos[29]; // 1 = puede, 0 = no puede (tiene resultado < 1 año)
+		// var dias_ultima_atencion = datos[25];
 
-		// Guardar valores de validación en campos hidden
-		$("#txtValidacionEdad").val(validacion_edad);
-		$("#txtValidacionSexo").val(validacion_sexo);
-		$("#txtPuedeAtenderse").val(puede_atenderse);
+		// // Guardar valores de validación en campos hidden
+		// $("#txtValidacionEdad").val(validacion_edad);
+		// $("#txtValidacionSexo").val(validacion_sexo);
+		// $("#txtPuedeAtenderse").val(puede_atenderse);
 
-		var mensajes_advertencia = [];
+		// var mensajes_advertencia = [];
 
-		if(validacion_edad == 0){
-			mensajes_advertencia.push("⚠️ ADVERTENCIA: El paciente debe tener entre 40 y 65 años (Edad actual: " + datos[20] + " años)");
-		}
+		// if(validacion_edad == 0){
+		// 	mensajes_advertencia.push("⚠️ ADVERTENCIA: El paciente debe tener entre 40 y 65 años (Edad actual: " + datos[20] + " años)");
+		// }
 
-		if(validacion_sexo == 0){
-			mensajes_advertencia.push("⚠️ ADVERTENCIA: Este examen solo está disponible para pacientes varones");
-		}
+		// if(validacion_sexo == 0){
+		// 	mensajes_advertencia.push("⚠️ ADVERTENCIA: Este examen solo está disponible para pacientes varones");
+		// }
 
-		if(puede_atenderse == 0){
-			var dias_faltantes = 365 - dias_ultima_atencion;
-			mensajes_advertencia.push("⚠️ ADVERTENCIA: El paciente tiene un resultado validado hace " + dias_ultima_atencion + " días. Debe esperar " + dias_faltantes + " días más (1 año desde el último resultado)");
-		}
+		// if(puede_atenderse == 0){
+		// 	var dias_faltantes = 365 - dias_ultima_atencion;
+		// 	mensajes_advertencia.push("⚠️ ADVERTENCIA: El paciente tiene un resultado validado hace " + dias_ultima_atencion + " días. Debe esperar " + dias_faltantes + " días más (1 año desde el último resultado)");
+		// }
 
-		if(mensajes_advertencia.length > 0){
-			Swal.fire({
-				icon: 'warning',
-				title: 'VALIDACIÓN DE CRITERIOS PARA LABORATORIO REFERENCIAL',
-				html: mensajes_advertencia.join("<br/><br/>"),
-				confirmButtonText: 'Entendido',
-				confirmButtonColor: '#f39c12',
-				width: '600px'
-			});
-		}
+		// if(mensajes_advertencia.length > 0){
+		// 	Swal.fire({
+		// 		icon: 'warning',
+		// 		title: 'VALIDACIÓN DE CRITERIOS PARA LABORATORIO REFERENCIAL',
+		// 		html: mensajes_advertencia.join("<br/><br/>"),
+		// 		confirmButtonText: 'Entendido',
+		// 		confirmButtonColor: '#f39c12',
+		// 		width: '600px'
+		// 	});
+		// }
 
 		buscar_datos_direc(datos[0]);
 	  }
