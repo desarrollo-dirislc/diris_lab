@@ -184,12 +184,19 @@ Where u.id_usuario=$1";
 
     public function get_tblDatosUsuario($sWhere, $sOrder, $sLimit, $param) {
       $this->db->getConnection();
-    if (empty($param[0]['idRol'])) {  
+    if (empty($param[0]['idRol'])) {
 		$this->sql = "Select u.id_usuario, p.id_persona id_paciente, p.id_tipodoc id_tipodocpac, tdp.abreviatura abrev_tipodocpac, p.nrodoc nro_docpac, Case When p.primer_ape isNull Then '' Else p.primer_ape End||' '||Case When p.segundo_ape isNull Then '' Else p.segundo_ape End ||' '||p.nombre_rs nombre_rsusu,
 		u.nom_usuario, to_char(u.fec_expiracion, 'DD/MM/YYYY') fec_expiracion, u.estado, Case When u.estado=1 Then 'ACTIVO'::Varchar Else 'DESACTIVADO'::Varchar End nom_estado
 		From tbl_usuario u
 		Inner Join tbl_persona p On u.id_persona = p.id_persona
-		Inner Join tbl_tipodoc tdp On p.id_tipodoc = tdp.id_tipodoc";
+		Inner Join tbl_tipodoc tdp On p.id_tipodoc = tdp.id_tipodoc
+		Where 1=1";
+		if (!empty($param[0]['busDoc'])) {
+			$this->sql .= " And Upper(p.nrodoc) Like Upper('%" . pg_escape_string($param[0]['busDoc']) . "%')";
+		}
+		if (!empty($param[0]['busUsuario'])) {
+			$this->sql .= " And Upper(u.nom_usuario) Like Upper('%" . pg_escape_string($param[0]['busUsuario']) . "%')";
+		}
 	} else {
 		$this->sql = "Select * From (Select u.id_usuario, p.id_persona id_paciente, p.id_tipodoc id_tipodocpac, tdp.abreviatura abrev_tipodocpac, p.nrodoc nro_docpac, Case When p.primer_ape isNull Then '' Else p.primer_ape End||' '||Case When p.segundo_ape isNull Then '' Else p.segundo_ape End ||' '||p.nombre_rs nombre_rsusu,
 		u.nom_usuario, to_char(u.fec_expiracion, 'DD/MM/YYYY') fec_expiracion, u.estado, Case When u.estado=1 Then 'ACTIVO'::Varchar Else 'DESACTIVADO'::Varchar End nom_estado
@@ -203,7 +210,14 @@ Where u.id_usuario=$1";
 		From tbl_usuario u
 		Inner Join tbl_persona p On u.id_persona = p.id_persona
 		Inner Join tbl_tipodoc tdp On p.id_tipodoc = tdp.id_tipodoc
-		Where u.id_usuario Not in (Select Distinct id_usuario From tbl_profesionalservicio Where estado=1)) u";
+		Where u.id_usuario Not in (Select Distinct id_usuario From tbl_profesionalservicio Where estado=1)) u
+		Where 1=1";
+		if (!empty($param[0]['busDoc'])) {
+			$this->sql .= " And Upper(nro_docpac) Like Upper('%" . pg_escape_string($param[0]['busDoc']) . "%')";
+		}
+		if (!empty($param[0]['busUsuario'])) {
+			$this->sql .= " And Upper(nom_usuario) Like Upper('%" . pg_escape_string($param[0]['busUsuario']) . "%')";
+		}
 	}
       $this->sql .= $sOrder . $sLimit;
       $this->rs = $this->db->query($this->sql);
@@ -216,7 +230,14 @@ Where u.id_usuario=$1";
 	  if (empty($param[0]['idRol'])) {
 		$this->sql = "Select count(*) cnt From tbl_usuario u
 		Inner Join tbl_persona p On u.id_persona = p.id_persona
-		Inner Join tbl_tipodoc tdp On p.id_tipodoc = tdp.id_tipodoc";
+		Inner Join tbl_tipodoc tdp On p.id_tipodoc = tdp.id_tipodoc
+		Where 1=1";
+		if (!empty($param[0]['busDoc'])) {
+			$this->sql .= " And Upper(p.nrodoc) Like Upper('%" . pg_escape_string($param[0]['busDoc']) . "%')";
+		}
+		if (!empty($param[0]['busUsuario'])) {
+			$this->sql .= " And Upper(u.nom_usuario) Like Upper('%" . pg_escape_string($param[0]['busUsuario']) . "%')";
+		}
 	  } else {
 		$this->sql = "Select count(*) cnt From (Select u.id_usuario, p.id_persona id_paciente, p.id_tipodoc id_tipodocpac, tdp.abreviatura abrev_tipodocpac, p.nrodoc nro_docpac, Case When p.primer_ape isNull Then '' Else p.primer_ape End||' '||Case When p.segundo_ape isNull Then '' Else p.segundo_ape End ||' '||p.nombre_rs nombre_rsusu,
 		u.nom_usuario, to_char(u.fec_expiracion, 'DD/MM/YYYY') fec_expiracion, u.estado, Case When u.estado=1 Then 'ACTIVO'::Varchar Else 'DESACTIVADO'::Varchar End nom_estado
@@ -230,7 +251,14 @@ Where u.id_usuario=$1";
 		From tbl_usuario u
 		Inner Join tbl_persona p On u.id_persona = p.id_persona
 		Inner Join tbl_tipodoc tdp On p.id_tipodoc = tdp.id_tipodoc
-		Where u.id_usuario Not in (Select Distinct id_usuario From tbl_profesionalservicio Where estado=1)) u";
+		Where u.id_usuario Not in (Select Distinct id_usuario From tbl_profesionalservicio Where estado=1)) u
+		Where 1=1";
+		if (!empty($param[0]['busDoc'])) {
+			$this->sql .= " And Upper(nro_docpac) Like Upper('%" . pg_escape_string($param[0]['busDoc']) . "%')";
+		}
+		if (!empty($param[0]['busUsuario'])) {
+			$this->sql .= " And Upper(nom_usuario) Like Upper('%" . pg_escape_string($param[0]['busUsuario']) . "%')";
+		}
 	  }
       $this->rs = $this->db->query($this->sql);
       $this->db->closeConnection();

@@ -22,25 +22,21 @@ $ups = new Ups();
           <form class="form-horizontal" name="frmBuscar" id="frmBuscar" onsubmit="return false;">
             <div class="form-group">
               <div class="col-md-2">
-                <label for="txtBusIdEstado">Estado</label>
-                <select name="txtBusIdEstado" id="txtBusIdEstado" class="form-control input-sm">
-                  <option value="1">-- Todo --</option>
-                  <option value="1">ACTIVO</option>
-                  <option value="2">INACTIVO</option>
-                </select>
+                <label for="txtBusDoc"><small>N° Documento:</small></label>
+                <input class="form-control input-sm" type="text" name="txtBusDoc" id="txtBusDoc" autocomplete="OFF" maxlength="20" tabindex="0" oninput="buscar_datos()"/>
+              </div>
+              <div class="col-md-3">
+                <label for="txtBusUsuario"><small>Nombre de Usuario:</small></label>
+                <input class="form-control input-sm text-uppercase" type="text" name="txtBusUsuario" id="txtBusUsuario" autocomplete="OFF" maxlength="50" tabindex="0" oninput="buscar_datos()"/>
               </div>
               <div class="col-sm-1 col-md-1">
                 <br/>
-                <button class="btn btn-success btn-sm" type="button" id="btnCon" onclick="buscar_datos();" tabindex="0"><i class="glyphicon glyphicon-search"></i> Buscar</button>
-              </div>
-              <div class="col-sm-4 col-md-4">
-                <br/>
-                <button id="btnRegistrarAsis" class="btn btn-warning pull-right btn-sm" type="button" onclick="exportar_busqueda();" tabindex="0"><i class="glyphicon glyphicon-open"></i> Exportar a Excel</button>
+                <button class="btn btn-default btn-sm" type="button" onclick="limpiar_filtros();" tabindex="0"><i class="glyphicon glyphicon-remove"></i> Limpiar</button>
               </div>
             </div>
           </form>
           <br/>
-          <table id="tblAtencion" class="display" cellspacing="0" width="100%">
+          <table id="tblAtencion" class="table table-hover table-bordered" cellspacing="0" width="100%">
             <thead>
               <tr>
                 <th><small>Documento</small></th>
@@ -103,31 +99,17 @@ var dTable;
 //var id_dep= document.getElementById('cboiddep').value;
 // #areas-grid adalah id pada table
 $(document).ready(function () {
-  $("#txtBusIdTipDoc").select2();
-
-  $("#txtBusFecIni").datepicker({
-    format: 'dd/mm/yyyy',
-    autoclose: true,
-  });
-  $("#txtBusFecFin").datepicker({
-    format: 'dd/mm/yyyy',
-    autoclose: true,
-  });
-
   dTable = $('#tblAtencion').DataTable({
-    /*"language": {
-    "url": "../plugins/datatables/Spanish.json"
-  },*/
-  "bLengthChange": true, //Paginado 10,20,50 o 100
+  "bLengthChange": true,
   "bProcessing": true,
   "bServerSide": true,
   "bJQueryUI": false,
-  "responsive": true,
+  "responsive": false,
   "bInfo": true,
   "bFilter": false,
-  "sAjaxSource": "tbl_principaluser.php", // Load Data
+  "sAjaxSource": "tbl_principaluser.php",
   "language": {
-    //"url": "../plugins/datatables/Spanish.json",
+    "url": "../../assets/plugins/datatables/Spanish.json",
     "lengthMenu": '_MENU_ registros por p\xe1gina',
     "search": '<i class="glyphicon glyphicon-search"></i>',
     "paginate": {
@@ -136,15 +118,10 @@ $(document).ready(function () {
     }
   },
   "sServerMethod": "POST",
-  "fnServerParams": function (aoData)
-  {
-    aoData.push({"name": "idEstado", "value": $("#txtBusIdEstado").val()});
-
+  "fnServerParams": function (aoData) {
+    aoData.push({"name": "busDoc",     "value": $("#txtBusDoc").val()});
+    aoData.push({"name": "busUsuario", "value": $("#txtBusUsuario").val()});
   },
-  /*"fnServerParams": function ( aoData ) {
-  aoData.push( { "name": "id_tabla", "value": $('#cboiddep').val() } );
-},*/
-
 "columnDefs": [
   {"orderable": false, "targets": 0, "searchable": false, "class": "small"},
   {"orderable": false, "targets": 1, "searchable": false, "class": "small font-weit"},
@@ -155,14 +132,16 @@ $(document).ready(function () {
   {"orderable": false, "targets": 6, "searchable": false, "class": "small text-center"}
 ]
 });
-
-$('#tblAtencion').removeClass('display').addClass('table table-hover table-bordered');
 });
 
 function buscar_datos() {
-  var idEstado = $("#txtBusIdEstado").val();
+  $("#tblAtencion").dataTable().fnDraw();
+}
 
-  $("#tblAtencion").dataTable().fnDraw()
+function limpiar_filtros() {
+  $("#txtBusDoc").val('');
+  $("#txtBusUsuario").val('');
+  $("#tblAtencion").dataTable().fnDraw();
 }
 
 function reg_usuario() {
@@ -310,7 +289,7 @@ function validFormClave() {
             //console.log(tmsg);
             if(tmsg == "OK"){
               $("#showClaveUsuario").modal('hide');
-              $("#tblSolicitud").dataTable().fnDraw();
+              $("#tblAtencion").dataTable().fnDraw();
             } else {
               bootbox.alert(msg);
               return false;
