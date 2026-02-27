@@ -129,7 +129,8 @@ foreach ($aColumns as $col) {
     }
 }
 
-$param[0]['idEstado'] = $input['idEstado'];
+$param[0]['busDoc'] = $input['busDoc'];
+$param[0]['busUsuario'] = $input['busUsuario'];
 //print_r($param);
 //Aqui se manda los parametros de busqueda
 $rResult = $a->get_tblDatosUsuario($sWhere, $sOrder, $sLimit, $param);
