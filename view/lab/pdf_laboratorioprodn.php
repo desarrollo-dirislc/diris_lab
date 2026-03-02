@@ -85,7 +85,8 @@ if(!empty($rowP['id_producto'])){
 }
 
 $codeContents ="http://app1.dirislimacentro.gob.pe/labs-result/?p=".md5($rsA[0]['id_dependencia'])."&valid=".$valini.".".md5($idAtencion).".".$valfin;
-$tempDir = ''; //EXAMPLE_TMP_SERVERPATH;
+//$tempDir = ''; //EXAMPLE_TMP_SERVERPATH;
+$tempDir = __DIR__ . '/';
 $fileName = 'qr/qr.jpg';
 $outerFrame = 4;
 $pixelPerPoint = 4;
