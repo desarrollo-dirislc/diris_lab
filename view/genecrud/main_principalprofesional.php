@@ -74,13 +74,13 @@ $ups = new Ups();
               </ul>
               <p><b>Botones de acción:</b></p>
               <div class="row">
-                <button class="btn btn-primary btn-sm" style="margin-bottom: 15px;" onclick="reg_registro('ins')"><i class="glyphicon glyphicon-plus"></i> Registrar Profesional</button>
+                <button class="btn btn-primary btn-sm" style="margin-bottom: 15px; border-radius: 4px;" onclick="reg_registro('ins')"><i class="glyphicon glyphicon-plus"></i> Registrar Profesional</button>
               </div>
               <div class="row">
-                <button class="btn btn-warning btn-sm" style="margin-bottom: 15px;" onclick="expor_usuarios()"><i class="glyphicon glyphicon-plus"></i> Exportar Usuarios</button>
+                <button class="btn btn-warning btn-sm" style="margin-bottom: 15px; border-radius: 4px;" onclick="expor_usuarios()"><i class="glyphicon glyphicon-plus"></i> Exportar Usuarios</button>
               </div>
               <div class="row">
-                <button class="btn btn-default btn-sm" id="btnBack" type="button" onclick="back();" tabindex="1"><i class="glyphicon glyphicon-log-out"></i> Ir al Men&uacute;</button>
+                <button class="btn btn-default btn-sm" id="btnBack" type="button" onclick="back();" tabindex="1" style="border-radius: 4px;"><i class="glyphicon glyphicon-log-out"></i> Ir al Men&uacute;</button>
               </div>
             </small>
           </div>

@@ -29,9 +29,8 @@ $ups = new Ups();
                 <label for="txtBusUsuario"><small>Nombre de Usuario:</small></label>
                 <input class="form-control input-sm text-uppercase" type="text" name="txtBusUsuario" id="txtBusUsuario" autocomplete="OFF" maxlength="50" tabindex="0" oninput="buscar_datos()"/>
               </div>
-              <div class="col-sm-1 col-md-1">
-                <br/>
-                <button class="btn btn-default btn-sm" type="button" onclick="limpiar_filtros();" tabindex="0"><i class="glyphicon glyphicon-remove"></i> Limpiar</button>
+              <div class="col-sm-1 col-md-1" style="padding-top: 25px;">                
+                <button class="btn btn-default btn-sm" type="button" onclick="limpiar_filtros();" tabindex="0" style="border-radius: 4px;"><i class="glyphicon glyphicon-remove"></i> Limpiar</button>
               </div>
             </div>
           </form>

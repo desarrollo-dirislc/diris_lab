@@ -14,7 +14,7 @@
             <div class="form-group">
               <div class="col-md-2">
                 <label for="txtBusIdEstado">Estado</label>
-                <select name="txtBusIdEstado" id="txtBusIdEstado" class="form-control input-sm">
+                <select name="txtBusIdEstado" id="txtBusIdEstado" class="form-control input-sm" style="border-radius: 4px;">
                   <option value="1">-- Todo --</option>
                   <option value="1">ACTIVO</option>
                   <option value="2">INACTIVO</option>
@@ -22,11 +22,11 @@
               </div>
               <div class="col-sm-1 col-md-1">
                 <br/>
-                <button class="btn btn-success btn-sm" type="button" id="btnCon" onclick="buscar_datos();" tabindex="0"><i class="glyphicon glyphicon-search"></i> Buscar</button>
+                <button class="btn btn-success btn-sm" type="button" id="btnCon" onclick="buscar_datos();" tabindex="0" style="border-radius: 4px;"><i class="glyphicon glyphicon-search"></i> Buscar</button>
               </div>
               <div class="col-sm-4 col-md-4">
                 <br/>
-                <button id="btnRegistrarAsis" class="btn btn-warning pull-right btn-sm" type="button" onclick="exportar_busqueda();" tabindex="0"><i class="glyphicon glyphicon-open"></i> Exportar a Excel</button>
+                <button id="btnRegistrarAsis" class="btn btn-warning pull-right btn-sm" type="button" onclick="exportar_busqueda();" tabindex="0" style="border-radius: 4px;"><i class="glyphicon glyphicon-open"></i> Exportar a Excel</button>
               </div>
             </div>
           </form>
@@ -57,10 +57,10 @@
               </ul>
               <p><b>Botones de acción:</b></p>
               <div class="row">
-                <button type="button" class="btn btn-primary btn-sm" style="margin-bottom: 15px;" onclick="reg_grupo()"><i class="glyphicon glyphicon-plus"></i> Registrar Grupo</button>
+                <button type="button" class="btn btn-primary btn-sm" style="border-radius: 4px; margin-bottom: 15px;" onclick="reg_grupo()"><i class="glyphicon glyphicon-plus"></i> Registrar Grupo</button>
               </div>
               <div class="row">
-                <button type="button" class="btn btn-default btn-sm" id="btnBack" type="button" onclick="back();" tabindex="1"><i class="glyphicon glyphicon-log-out"></i> Ir al Men&uacute;</button>
+                <button type="button" class="btn btn-default btn-sm" id="btnBack" type="button" onclick="back();" tabindex="1" style="border-radius: 4px;"><i class="glyphicon glyphicon-log-out"></i> Ir al Men&uacute;</button>
               </div>
             </small>
           </div>
