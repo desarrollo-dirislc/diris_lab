@@ -282,6 +282,30 @@ Order By edadanio_min, edadmes_min, edaddia_min";
     return $this->rs[0]['cnt'];
   }
 
+   public function get_listaTipoSeleccionResultado() {
+    $this->db->getConnection();
+    $this->sql = "SELECT id, nombre_resultado tipo FROM tbl_componente_seleccionresul Where estado=1";
+    $this->rs = $this->db->query($this->sql);
+    $this->db->closeConnection();
+    return $this->rs;
+  }
+
+  public function get_listaMetodos($id=0, $estadoreg=0) {
+		$conet = $this->db->getConnection();
+		$this->sql = "SELECT id, abreviatura_metodo, nombre_metodo, descrip_metodo,
+    estado, case estado When 1 Then 'ACTIVO' ELSE 'INACTIVO' End nom_estado
+    FROM lab.tbl_metodo";
+		if ($id <> 0){
+			$this->sql .= " Where id=" . $id;
+		}
+		if ($estadoreg <> 0){
+			$this->sql .= " Where estado=" . $estadoreg;
+		}
+		$this->rs = $this->db->query($this->sql);
+		$this->db->closeConnection();
+		return $this->rs;
+	}
+
   /*
 
   public function get_tblDatosComponentePorGrupoArea($sWhere, $sOrder, $sLimit, $param) {
