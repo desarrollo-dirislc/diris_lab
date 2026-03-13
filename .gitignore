@@ -2,4 +2,5 @@
 .claude/
 model/ConectaDb.php
 view/pap/examen/
+view/lab/qr/
 
