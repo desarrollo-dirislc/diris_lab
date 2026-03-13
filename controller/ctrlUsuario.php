@@ -13,6 +13,8 @@ $labIdDepUser = $_SESSION['labIdDepUser'];
 
 require_once '../model/Usuario.php';
 $u = new Usuario();
+require_once '../model/Menu.php';
+$ma = new Menu();
 
 function to_pg_array($set) {
   settype($set, 'array'); // can be called with a scalar or array
@@ -77,6 +79,42 @@ switch ($_POST['accion']) {
   }
   echo $rs;
   exit();
+  break;
+  /* =========================================================
+   *  ACCESOS x USUARIO
+   * ========================================================= */
+  case 'GET_BUSCAR_PROFSERV':
+    $rs = $ma->get_buscarProfServParaAcceso($_POST['busqueda']);
+    $salida = array();
+    foreach ($rs as $row) {
+      $salida[] = array(
+        'id_profesionalservicio' => $row['id_profesionalservicio'],
+        'id_dependencia'         => $row['id_dependencia'],
+        'nom_depen'              => $row['nom_depen'],
+        'nrodoc'                 => $row['nrodoc'],
+        'abrev_tipodoc'          => $row['abrev_tipodoc'],
+        'nombre_completo'        => $row['nombre_completo'],
+        'nom_usuario'            => $row['nom_usuario'],
+        'nom_rol'                => $row['nom_rol'],
+      );
+    }
+    echo json_encode($salida);
+  break;
+  case 'GET_ACCESOS_ASIGNADOS':
+    $rs = $ma->get_accesosAsignados($_POST['id_profesionalservicio'], $_POST['id_menu']);
+    echo json_encode($rs);
+  break;
+  case 'GET_ACCESOS_DISPONIBLES':
+    $rs = $ma->get_accesosDisponibles($_POST['id_profesionalservicio'], $_POST['id_menu']);
+    echo json_encode($rs);
+  break;
+  case 'POST_ADD_ACCESO':
+    $rs = $ma->post_add_accesoUsuario($_POST['id_profesionalservicio'], $_POST['id_detmenu'], $labIdUser);
+    echo $rs;
+  break;
+  case 'POST_DEL_ACCESO':
+    $rs = $ma->post_del_accesoUsuario($_POST['id_profesionalservicio'], $_POST['id_detmenu'], $labIdUser);
+    echo $rs;
   break;
   case 'POST_ADD_PWDUSUARIO':
   if(isset($_POST['id_usuario'])){
