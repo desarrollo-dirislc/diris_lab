@@ -71,6 +71,7 @@
                 <span class="badge" id="cntAsignados">0</span>
               </h4>
             </div>
+            
             <div class="panel-body" style="padding:5px;">
               <ul class="list-group" id="listaAsignados"
                   style="max-height:350px; overflow-y:auto; margin-bottom:0;">
