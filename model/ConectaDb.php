@@ -6,8 +6,8 @@ class ConectaDb {
     var $rs = null;
 
     function __construct() {
-        $this->srv = 'srvdiris';
-          $this->db = 'pe_diris_slab_dev';
+        $this->srv = '10.0.0.3';
+          $this->db = 'pe_diris_slab_test';
           $this->user = 'usr_lab';
           $this->pwd = 'lab@12345';
     }
