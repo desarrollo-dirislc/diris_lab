@@ -1,0 +1,753 @@
+<?php
+session_start();
+if (!isset($_SESSION["labAccess"])) {
+  header("location:../index.php");
+  exit();
+}
+if ($_SESSION["labAccess"] <> "Yes") {
+  header("location:../index.php");
+  exit();
+}
+$labIdUser = $_SESSION['labIdUser'];
+$labIdDepUser = $_SESSION['labIdDepUser'];
+$labIdServicioDepUser = $_SESSION['labIdServicioDep'];
+
+require_once '../model/Pap.php';
+$pap = new Pap();
+
+function to_pg_array($set) {
+  settype($set, 'array'); // can be called with a scalar or array
+  $result = array();
+  foreach ($set as $t) {
+    if (is_array($t)) {
+      $result[] = to_pg_array($t);
+    } else {
+      $t = str_replace('"', '\\"', $t); // escape double quote
+      if (!is_numeric($t)) // quote only non-numeric values
+      $t = '"' . $t . '"';
+      $result[] = $t;
+    }
+  }
+  return '{' . implode(",", $result) . '}'; // format
+}
+
+if(isset($_POST['accion'])){
+	$accion = $_POST['accion'];
+}
+if(isset($_GET['accion'])){
+	$accion = $_GET['accion'];
+}
+
+switch ($accion) {
+  case 'POST_ADD_REGSOLICITUD':
+    $id_colposcopia = "";
+	$id_biopsia = "";
+	if($_POST['txtResultadoAnteExa'] <> ""){
+		foreach ($_POST['txtResultadoAnteExa'] as $clave=>$valor){
+		  if ($valor == "1"){
+			$id_colposcopia = "1";
+		  }
+		  if ($valor == "2"){
+			$id_biopsia = "2";
+		  }
+		}
+	}
+  
+  $arr_paciente[0] = array($_POST['txtIdPac'], $_POST['txtIdTipDocPac'], $_POST['txtNroDocPac'], trim($_POST['txtNomPac']), trim($_POST['txtPriApePac']), trim($_POST['txtSegApePac']), $_POST['txtIdSexoPac'], $_POST['txtFecNacPac'], trim($_POST['txtNroTelFijoPac']), trim($_POST['txtNroTelMovilPac']) , trim($_POST['txtEmailPac']), trim($_POST['txtUBIGEOPac']), $_POST['txtDirPac'], trim($_POST['txtDirRefPac']), trim($_POST['txtNroHCPac']), $_POST['txtIdPaisNacPac'], $_POST['txtIdEtniaPac']);
+  $arr_apoderado[0] = array($_POST['txtIdSoli'], $_POST['txtIdTipDocSoli'], $_POST['txtNroDocSoli'], trim($_POST['txtNomSoli']), trim($_POST['txtPriApeSoli']), trim($_POST['txtSegApeSoli']), $_POST['txtIdSexoSoli'], $_POST['txtFecNacSoli'], trim($_POST['txtNroTelFijoSoli']), trim($_POST['txtNroTelMovilSoli']) , trim($_POST['txtEmailSoli']), $_POST['txtIdPaisNacSoli'], $_POST['txtIdEtniaSoli'], trim($_POST['txtIdParenSoli']));
+  $arr_solicitud[0] = array($_POST['txtIdAtencion'], $_POST['txtFUR'], trim($_POST['txtFechaFUR']), $_POST['txtIdGestante'], trim($_POST['txtFechaParto']) , trim($_POST['txtGest']), trim($_POST['txtPARA1']), trim($_POST['txtPARA2']), trim($_POST['txtPARA3']), trim($_POST['txtPARA4']),/*10*/ $_POST['txtPAPANte'], $_POST['txtResultadoAnte'], trim($_POST['txAnioResulAnte']), $_POST['txtAnorEscamosa'], $_POST['txtAnorGlandular'], trim($_POST['txtPesoPac']), trim($_POST['txtTallaPac']), trim($_POST['txtPAPac']), $_POST['txtTipPac'], trim($_POST['txtNroFUA'])/*20*/, trim($_POST['txtCodPrestacional']), trim($_POST['txtIdTipPacParti']), trim($_POST['txtIdCondiDepen']), trim($_POST['txtIdCondiServ']), trim($_POST['txtIRS']), trim($_POST['txtObsSoli']), trim($_POST['txtIMCPac']), $id_colposcopia,$id_biopsia);
+  $nroArrayA = (int) 0;
+  if($_POST['txtAnticonceptivo'] <> ""){
+    foreach ($_POST['txtAnticonceptivo'] as $clave=>$valor){
+      //echo "El valor de $clave es: $valor";
+      if ($valor == "6"){
+        $arr_anticonceptivo[$nroArrayA] = array($valor, $_POST['txtDetAnticonceptivo']);
+      } else {
+        $arr_anticonceptivo[$nroArrayA] = array($valor, '');
+      }
+      $nroArrayA ++;
+    }
+  } else {
+    $arr_anticonceptivo[0] = array('');
+  }
+
+  $nroArrayS = (int) 0;
+  if($_POST['txtSintoma'] <> ""){
+    foreach ($_POST['txtSintoma'] as $clave=>$valor){
+      //echo "El valor de $clave es: $valor";
+      if ($valor == "6"){
+        $arr_sintoma[$nroArrayS] = array($valor, $_POST['txtDetSintoma']);
+      } else {
+        $arr_sintoma[$nroArrayS] = array($valor, '');
+      }
+      $nroArrayS ++;
+    }
+  } else {
+    $arr_sintoma[0] = array('');
+  }
+
+  $nroArrayE = (int) 0;
+  if($_POST['txtExaCervico'] <> ""){
+    foreach ($_POST['txtExaCervico'] as $clave=>$valor){
+      $arr_exacervico[$nroArrayE] = array($valor);
+      $nroArrayE ++;
+    }
+  } else {
+    $arr_exacervico[0] = array('');
+  }
+
+  $nroArrayD = (int) 0;
+  foreach ($_POST['txtIdDiagnostico'] as $clave=>$valor){
+    $arr_diagnostico[$nroArrayD] = array($valor);
+    $nroArrayD ++;
+  }
+  
+  if(isset($_POST['diagnosticos'])){
+	$diag = json_decode(stripslashes($_POST['diagnosticos']));
+	if(count($diag)>0){
+		for ($i = 0; $i < count($diag); $i++) {
+			$arr_diagnostico[$nroArrayD] = array($diag[$i][1]);
+			$nroArrayD ++;
+		}
+	}
+  }
+  
+  if($_POST['txtIdAtencion'] == "0"){
+    $action = "C";
+  } else {
+    $action = "E";
+  }
+  $paramReg[0]['accion'] = $action;
+  $paramReg[0]['paciente'] = to_pg_array($arr_paciente);
+  $paramReg[0]['apoderado'] = to_pg_array($arr_apoderado);
+  $paramReg[0]['solicitud'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['anticonceptivo'] = to_pg_array($arr_anticonceptivo);
+  $paramReg[0]['sintoma'] = to_pg_array($arr_sintoma);
+  $paramReg[0]['exaCervico'] = to_pg_array($arr_exacervico);
+  $paramReg[0]['diagnostico'] = to_pg_array($arr_diagnostico);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_solicitud($paramReg);
+  if ($rs == "E") {
+    echo "ER|Error al ingresar la atención";
+    exit();
+  }
+  echo "OK|".$rs;
+  exit();
+  break;
+  case 'GET_SHOW_VALIDANTERIORATENION':
+  $rs = $pap->get_validPAPAnterior($_GET['id_tipdoc'],$_GET['nro_doc']);
+  $nr = count($rs);
+  if ($nr > 0) {
+	if($rs[0]['anio'] == 0){
+		if($rs[0]['mes'] <= 5){
+			$datos = array(
+			  0 => '1',
+			  1 => $rs[0]['id_paciente']
+			);
+		} else {
+			$datos = array(
+			  0 => '0'
+			);
+		}
+	} else {
+		$datos = array(
+		  0 => '2'
+		);
+	}
+  } else {
+    $datos = array(
+      0 => '0'
+    );
+  }
+  echo json_encode($datos);
+  break;
+  case 'POST_ADD_REGVALIDARESULTADO':
+  $arr_detalle[0] = array($_POST['txtIdPap']);
+  $paramReg[0]['accion'] = 'VR';
+  $paramReg[0]['detalle'] = to_pg_array($arr_detalle);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_papfinaliza($paramReg);
+  echo $rs;
+  break;
+  case 'POST_ADD_REGFINALIZAPAP':
+  $arr_detalle[0] = array($_POST['txtIdPap'], $_POST['txtDetComen']);
+  $paramReg[0]['accion'] = $_POST['txtTipAcc'];
+  $paramReg[0]['detalle'] = to_pg_array($arr_detalle);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_papfinaliza($paramReg);
+  echo $rs;
+  break;
+  case 'POST_ADD_REGENVIO':
+  $nroArrayS = (int) 0;
+  $idSolicitud = explode(",", $_POST['txtIdSoli']);
+  foreach ($idSolicitud as $clave => $valor){
+    $arr_solicitud[$nroArrayS] = array($valor, '');
+    $nroArrayS ++;
+  }
+  $paramReg[0]['accion'] = 'N';
+  $paramReg[0]['envio'] = 0;
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+  case 'POST_ADD_REGENVIOALABORATORIO':
+  $arr_solicitud[0] = array('');
+  $paramReg[0]['accion'] = 'NL';
+  $paramReg[0]['envio'] = $_POST['txtIdEnv'];
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+  case 'POST_ADD_REGENVIORECEPCIONSEDE':
+  $arr_solicitud[0] = array('');
+  $paramReg[0]['accion'] = 'RS';
+  $paramReg[0]['envio'] = $_POST['txtIdEnv'];
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+  case 'POST_ADD_REGENVIORECEPCION':
+  $arr_solicitud[0] = array('');
+  $paramReg[0]['accion'] = 'R';
+  $paramReg[0]['envio'] = $_POST['txtIdEnv'];
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+  
+  case 'POST_ADD_REGENVIORECEPCIONMANUAL':
+  $arr_solicitud[0] = array('');
+  $paramReg[0]['accion'] = 'RM';
+  $paramReg[0]['envio'] = $_POST['txtIdEnv'];
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser . "|" . $labIdServicioDepUser . "|" . $_POST['txtNroRegLab'];
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+  case 'POST_ADD_REGENVIOOBSOACEPTARDET':
+  $nroArrayS = (int) 0;
+  $idSolicitud = explode(",", $_POST['txtIdEnvDet']);
+  foreach ($idSolicitud as $clave => $valor){
+    $arr_solicitud[$nroArrayS] = array($valor, $_POST['txtIdEstEnvDet'], $_POST['txtIdObsEstEnvDet'], $_POST['txtDetObsEstEnvDet']);
+    $nroArrayS ++;
+  }
+
+  if($_POST['txtTipoOpe'] == "1"){
+    $accion = "R"; //Rechazar
+  } else if ($_POST['txtTipoOpe'] == "2"){
+    $accion = "O"; //Observar
+  } else if ($_POST['txtTipoOpe'] == "AO"){
+    $accion = "AO"; //Aceptar observado
+  } else if ($_POST['txtTipoOpe'] == "RO"){
+    $accion = "RO"; //Rechazar observado
+  } else {
+    $accion = "A"; //Aceptar
+  }
+
+  $paramReg[0]['accion'] = $accion;
+  $paramReg[0]['envio'] = $_POST['txtIdEnv'];
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+
+  case 'POST_ADD_REGFINALIZAENVIO':
+  $arr_solicitud[0] = array($_POST['optObsLabEnv'], $_POST['txtNroFichaLabEnv'], $_POST['txtDetObsLabEnv']);
+  $paramReg[0]['accion'] = 'F';
+  $paramReg[0]['envio'] = $_POST['txtIdEnv'];
+  $paramReg[0]['muestra'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envio($paramReg);
+  echo $rs;
+  break;
+
+  case 'POST_ADD_REGRESULTADO':
+  if(isset($_POST['txtObsResulInt'])){
+    $txtObsResulInt = trim($_POST['txtObsResulInt']);
+  } else {
+    $txtObsResulInt = "";
+  }
+  $arr_paciente[0] = array('');
+  $arr_apoderado[0] = array('');
+  $arr_solicitud[0] = array($_POST['txtIdSolicitud'], $_POST['txtSatisfactoria'], $_POST['txtInsatisfactoria'], $_POST['txtNegaLesion'], $_POST['txtAnorEscamosa'], $_POST['txtAnorGlandular'], trim($_POST['txtFecResul']), trim($_POST['txtNroRegLab']), trim($_POST['txtObsResul']), $txtObsResulInt);
+  $arr_anticonceptivo[0] = array('');
+
+  $nroArrayE = (int) 0;
+  if($_POST['txtCambioCel'] <> ""){
+    foreach ($_POST['txtCambioCel'] as $clave => $valor){
+      if ($valor == "8"){
+        $arr_sintoma[$nroArrayE] = array($valor, $_POST['txtIdDetCambioCel']);
+      } else {
+        $arr_sintoma[$nroArrayE] = array($valor, '');
+      }
+      $nroArrayE ++;
+    }
+  } else {
+    $arr_sintoma[0] = array('');
+  }
+
+  if($_POST['txtIdResultado'] == "0"){
+    $accion = "RR"; //Registrar resulado
+  } else {
+    $accion = $_POST['txtOpt']; //ERV - ER
+  }
+
+  $arr_exacervico[0] = array('');
+  $arr_diagnostico[0] = array('');
+  $paramReg[0]['accion'] = $accion;
+  $paramReg[0]['paciente'] = to_pg_array($arr_paciente);
+  $paramReg[0]['apoderado'] = to_pg_array($arr_apoderado);
+  $paramReg[0]['solicitud'] = to_pg_array($arr_solicitud);
+  $paramReg[0]['anticonceptivo'] = to_pg_array($arr_anticonceptivo);
+  $paramReg[0]['sintoma'] = to_pg_array($arr_sintoma);
+  $paramReg[0]['exaCervico'] = to_pg_array($arr_exacervico);
+  $paramReg[0]['diagnostico'] = to_pg_array($arr_diagnostico);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_solicitud($paramReg);
+  if ($rs == "E") {
+    echo "ER|Error al ingresar la atención";
+    exit();
+  }
+  echo "OK|".$rs;
+  exit();
+  break;
+
+  case 'GET_SHOW_LISTAOBSPORIDESTENV':
+  $rs = $pap->get_listaObservadoPorIdEnvDet($_POST['txtIdEstEnvDet']);
+  echo json_encode($rs);
+  break;
+  case 'GET_SHOW_DETOBSPORIDDETENV':
+  $rs = $pap->get_datosObsDetEnvPorIdDetEnv($_POST['idDetEnv']);
+  $nr = count($rs);
+  if ($nr > 0) {
+    $datos = array(
+      0 => $rs[0]['id_papenviodetobs'],
+      1 => $rs[0]['id_papenviodet'],
+      2 => $rs[0]['id_accion'],
+      3 => $rs[0]['nom_accion'],
+      4 => $rs[0]['id_motobs'],
+      5 => $rs[0]['nom_motobs'],
+      6 => $rs[0]['det_obs'],
+      7 => $rs[0]['estado'],
+      8 => $rs[0]['det_sub']
+    );
+    echo json_encode($datos);
+  } else {
+    $datos = array(
+      0 => '0'
+    );
+  }
+  break;
+  case 'GET_SHOW_LISTAMOTIVONOCONFORPORIDTIPO':
+  $rs = $pap->get_listaMotivoNoConforPorIdTipo($_POST['txtIdTipNoConfor']);
+  echo json_encode($rs);
+  break;
+  case 'POST_ADD_ENVIOMOTIVONOCONFOR':
+  $arr_detalle[0] = array($_POST['txtIdEnv'], $_POST['txtIdMotNoConfor'], $_POST['txtDetNoConfor']);
+  $paramReg[0]['accion'] = 'C';
+  $paramReg[0]['detalle'] = to_pg_array($arr_detalle);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_envionoconfor($paramReg);
+  echo $rs;
+  break;
+  case 'GET_SHOW_MOTIVONOCONFORPORIDENV':
+  $rs = $pap->get_datosMotivoNoConforPorIdEnv($_POST['txtIdEnv']);
+  $cnt = count($rs);
+  $datos = array(
+    0 => $cnt,
+    1 => $rs
+  );
+  echo json_encode($datos);
+  break;
+  case "GET_CNTATENCIONLABESTADOSPORFECHA":
+  $param[0]['tipoFec'] = $_POST['tipoFec'];
+  $param[0]['fecIniAte'] = $_POST['fecIni'];
+  $param[0]['fecFinAte'] = $_POST['fecFin'];
+  $param[0]['idProfe'] = $_POST['idProfe'];
+
+  $rs = $pap->get_repCntAtencionEstadoPorFecha($param);
+  //print_r($rs);
+  $cnt_total = $rs[0]['cnt_estado'] + $rs[1]['cnt_estado'] + $rs[2]['cnt_estado'] + $rs[3]['cnt_estado'] + $rs[4]['cnt_estado'] + $rs[5]['cnt_estado'] + $rs[6]['cnt_estado'];
+  if($cnt_total <> 0){
+    $porc_tot = 100;
+  } else {
+    $porc_tot = 0;
+  }
+  ?>
+  <div class="progress-group">
+    <span class="progress-text">Total</span>
+    <span class="progress-number"><b><?php echo $cnt_total?></b>/<?php echo $cnt_total?></span>
+    <div class="progress sm">
+      <div class="progress-bar" style="width: <?php echo $porc_tot?>%"></div>
+    </div>
+  </div>
+  <?php
+  foreach ($rs as $row) {
+    if($cnt_total <> 0){
+      $porc = ($row['cnt_estado'] * 100) / $cnt_total;
+    } else {
+      $porc = 0;
+    }
+
+    ?>
+    <div class="progress-group">
+      <span class="progress-text"><?php echo $row['nom_estado']?></span>
+      <span class="progress-number"><b><?php echo $row['cnt_estado']?></b>/<?php echo $cnt_total?></span>
+      <div class="progress sm">
+        <div class="progress-bar" style="width: <?php echo $porc?>%"></div>
+      </div>
+    </div>
+    <?php
+  }
+  break;
+  case "POST_ADD_REGANULAENTREGAPAP":
+  if($_POST['txtTipAcc'] == "A"){
+    $arr_detalle[0] = array($_POST['txtIdPap'],$_POST['txtDetComen']);
+  } else {
+    $arr_detalle[0] = array($_POST['txtIdPap'],$_POST['txtIdTipNotif'],$_POST['txtDetComen']);
+  }
+  $paramReg[0]['accion'] = $_POST['txtTipAcc'];
+  $paramReg[0]['detalle'] = to_pg_array($arr_detalle);
+  $paramReg[0]['userIngreso'] = $labIdUser . "|" . $labIdDepUser ."|". $labIdServicioDepUser;
+  /*print_r($paramReg);
+  exit();*/
+  $rs = $pap->post_reg_papfinaliza($paramReg);
+  echo $rs;
+  break;
+  Case "GET_SHOW_RESULINICIALVALID":
+  $idResul = $_POST['idResul'];
+  $rsSPAPR = $pap->get_datosResultadoIni($idResul);
+  ?>
+  <div class="modal-dialog modal-lg">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">RESULTADO INICIAL REGISTRADO POR EL TECNÓLOGO MÉDICO:</h2>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-3">
+            <dl>
+				<dt>N° Lámina Laboratorio:</dt>
+					<dd><?php echo $rsSPAPR[0]['nro_reglab'] . "-" . $rsSPAPR[0]['anio_reglab']?></dd>
+				<dt>Realizado por:</dt>
+					<dd><?php echo $rsSPAPR[0]['nombre_rstec']?></dd>
+				<dt>Fecha resultado:</dt>
+					<dd><?php echo $rsSPAPR[0]['fec_resul']?></dd>
+				<dt>Validado Por:</dt>
+					<dd><?php echo $rsSPAPR[0]['nombre_rsenclab']?></dd>
+				<dt>Fecha validación:</dt>
+					<dd><?php echo $rsSPAPR[0]['fec_resulvali']?></dd>
+			</dl>
+		</div>
+		<div class="col-sm-9" style="border-left: 1px solid;">
+		  <dl class="dl-horizontal">
+			<dt>EESS:</dt>
+			<dd><?php echo $rsSPAPR[0]['nom_depen']?> &nbsp;&nbsp;-&nbsp;&nbsp;<b>N° ORDEN:  </b> <?php echo $rsSPAPR[0]['nro_ordenatencion'] . "-" . $rsSPAPR[0]['anio_ordensoli'];?></dd>
+			<dt>Paciente:</dt>
+			<dd><?php echo $rsSPAPR[0]['nombre_rs']?> &nbsp;&nbsp;-&nbsp;&nbsp;<b>EDAD:  </b> <?php echo $rsSPAPR[0]['edad_pac']?></dd>
+			<dd></dd>
+		  </dl>
+		  <dl>
+			<dt>- CALIDAD DE MUESTRA</dt>
+			<?php
+			if($rsSPAPR[0]['id_tipinsatisfactoria'] <> ""){
+			  echo "<dd><b>INSATISFACTORIA: </b>";
+			  echo $resulInsa1 = ($rsSPAPR[0]['id_tipinsatisfactoria'] == "1") ? 'Escasas células' : '';
+			  echo $resulInsa2 = ($rsSPAPR[0]['id_tipinsatisfactoria'] == "2") ? '>75% Leucocitos PMN' : '';
+			  echo $resulInsa3 = ($rsSPAPR[0]['id_tipinsatisfactoria'] == "3") ? '>75% Hematíes' : '';
+			  echo $resulInsa4 = ($rsSPAPR[0]['id_tipinsatisfactoria'] == "4") ? 'Mala fijación' : '';
+			  echo "</dd>";
+			} else {
+			  echo "<dd><b>SATISFACTORIA: </b>".$resulSatis = ($rsSPAPR[0]['id_tipsatisfactoria'] == "1") ? 'Con Células Endocervicales' : 'Sin Células Endocervicales</dd>';
+			  echo "<hr style='margin-top: 10px; margin-bottom: 5px;'/><dd><b>- RESULTADO: </b>";
+			  if($rsSPAPR[0]['negalesion'] == "1"){
+				echo 'NEGATIVO</dd>';
+			  } else {
+				echo 'POSITVO</dd>';
+				if($rsSPAPR[0]['id_anorescamosa'] <> ""){
+				  echo "<dd><b>ANORMALIDAD DE CÉLULAS EPITELIALES ESCAMOSAS: </b>";
+				  echo $esca1 = ($rsSPAPR[0]['id_anorescamosa'] == "1") ? 'ASCUS' : '';
+				  echo $esca2 = ($rsSPAPR[0]['id_anorescamosa'] == "2") ? 'L.I.E. de bajo grado' : '';
+				  echo $esca3 = ($rsSPAPR[0]['id_anorescamosa'] == "3") ? 'ASCH' : '';
+				  echo $esca4 = ($rsSPAPR[0]['id_anorescamosa'] == "4") ? 'L.I.E. de alto grado' : '';
+				  echo $esca5 = ($rsSPAPR[0]['id_anorescamosa'] == "5") ? 'CARCINOMA IN SITU' : '';
+				  echo $esca6 = ($rsSPAPR[0]['id_anorescamosa'] == "6") ? 'CARCINOMA INVASOR' : '';
+				  echo "</dd>";
+				} else {
+				  echo "<dd><b>ANORMALIDAD DE CÉLULAS EPITELIALES GLANDULARES: </b>";
+				  echo $glandu1 = ($rsSPAPR[0]['id_anorglandular'] == "1") ? 'CÉLULAS GLANDULARES ATÍPICAS' : '';
+				  echo $glandu2 = ($rsSPAPR[0]['id_anorglandular'] == "2") ? 'CÉLULAS GLANDULARES ATÍPICAS SUGESTIVAS DE NEOPLASIA' : '';
+				  echo $glandu3 = ($rsSPAPR[0]['id_anorglandular'] == "3") ? 'ADENOCARCINOMA IN SITU' : '';
+				  echo$glandu4 = ($rsSPAPR[0]['id_anorglandular'] == "4") ? 'ADENOCARCINOMA' : '';
+				  echo "</dd>";
+				}
+			  }
+
+			  $rsSPAPRCC = $pap->get_datosCambioCelPorIdResultadoIni($rsSPAPR[0]['id_papresul']);
+			  if (count($rsSPAPRCC) <> 0){
+				echo "<hr style='margin-top: 10px; margin-bottom: 5px;'/><dd><b>- CAMBIO CELULARES BENIGNOS: </b>";
+				foreach ($rsSPAPRCC as $rowCC) {
+				  if ($rowCC['id_tipcambiocel'] == "1") echo $benig1 = 'METAPLASIA ESCAMOSA - ';
+				  if ($rowCC['id_tipcambiocel'] == "2") echo $benig2 = 'CÁNDIDA  - ';
+				  if ($rowCC['id_tipcambiocel'] == "3") echo $benig3 = 'ATROFIA - ';
+				  if ($rowCC['id_tipcambiocel'] == "4") echo $benig4 = 'VAGINOSIS - ';
+				  if ($rowCC['id_tipcambiocel'] == "5") echo $benig5 = 'CAMBIO POR DIU - ';
+				  if ($rowCC['id_tipcambiocel'] == "6") echo $benig6 = 'HERPES - ';
+				  if ($rowCC['id_tipcambiocel'] == "7") echo $benig7 = 'TRICHOMONAS VAGINALES - ';
+				  if ($rowCC['id_tipcambiocel'] == "8"){
+					echo $benig8 = 'INFLAMACIÓN PMN (';
+					if ($rowCC['det_tipcambiocel'] == "1") echo $detbenig1 = 'LEVE';
+					if ($rowCC['det_tipcambiocel'] == "2") echo $detbenig2 = 'MODERADO';
+					if ($rowCC['det_tipcambiocel'] == "3") echo $detbenig3 = 'SEVERO';
+					echo ")";
+				  }
+				}
+				echo "</dd>";
+			  }
+			}
+			echo "<hr style='margin-top: 10px; margin-bottom: 5px;'/><dt>- OBSERVACIONES</dt>";
+			echo "<dt>CON EL PACIENTE:</dt>";
+			echo "<dd>".nl2br($rsSPAPR[0]['obs_resul'])."</dd>";
+			echo "<dt>INTERNAS:</dt>";
+			echo "<dd>".nl2br($rsSPAPR[0]['obs_resulvalid'])."</dd>";
+			?>
+		  </dl>
+		</div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-default btn-block" type="button" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Cerrar Ventana</button>
+                </div>
+              </div>
+            </div>
+            <?php
+            break;
+            Case "GET_SHOW_DATOSATENCION":
+            $idSolicitud = $_POST['idSoli'];
+            $rsSPAP = $pap->get_datosSolicitud($idSolicitud);
+            ?>
+            <div class="modal-dialog modal-xs">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title">Datos Lámina</h2>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <img src="../../assets/images/lamina_pap.jpg" class="img-responsive" alt="Responsive image">
+                    </div>
+                    <div class="col-sm-9">
+                      <?php
+                      //print_r($rsSPAP);
+                      $arrNomFalle = explode(" ", $rsSPAP[0]['nombre_pac']);
+                      $cntNomFalle = count($arrNomFalle);
+                      $priNomFalle = mb_substr($arrNomFalle[0], 0, 1); // porción1
+                      $otroNomFalle = "";
+                      for($i = 1; $i < $cntNomFalle; $i++){
+                        $otroNomFalle.= "".mb_substr($arrNomFalle[$i], 0, 1);
+                      }
+                      echo '<dt>N° Lámina EESS:</dt>';
+                      echo "<h2 class='text-center' style='margin-top: 2px; font-weight:bold'>".$rsSPAP[0]['nro_ordenatencion'] . "-". $rsSPAP[0]['anio_ordensoli'] . "</h2>";
+                      echo '<dt>Código RENAES - EESS:</dt>';
+                      echo "<h2 class='text-center' style='margin-top: 2px; font-weight:bold'>".$rsSPAP[0]['codref_depen'] . "</h2>";
+                      echo '<dt>Iniciales de la paciente:</dt>';
+                      echo "<h2 class='text-center' style='margin-top: 2px; font-weight:bold'>".$rsSPAP[0]['abrev_apepac'] . $priNomFalle . $otroNomFalle . "</h2>";
+                      echo '<dt>Apellidos y nombres de la paciente:</dt>';
+                      echo "<h4 style='margin-top: 2px;'>".$rsSPAP[0]['nombre_rs'] . "</h4>";
+                      ?>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+				<?php if(isset($_POST['opt'])){?>
+					<button class="btn btn-success btn-block" type="button" onclick="event.preventDefault(); edit_solicitud(<?php echo $idSolicitud?>)"><i class="glyphicon glyphicon-pencil"></i> Continuar editando la atención</button>
+					<br/>
+				   <div class="btn-group btn-group-justified">
+					  <a href="#" class="btn btn-info" onclick="event.preventDefault(); open_pdfsinvalor()"><i class="glyphicon glyphicon-eye-open"></i> Imprimir ficha</a>
+					  <a href="#" class="btn btn-default" onclick="event.preventDefault(); back()"><i class="glyphicon glyphicon-remove"></i> Salir del formulario</a>
+					</div> 
+				<?php } else {?>
+					<button type="button" class="btn btn-default btn-block" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Cerrar ventana</button>
+				<?php }?>
+                </div>
+              </div>
+            </div>
+            <?php
+            break;
+            case "GET_SHOW_OPTIMPRESIONRESUL";
+            ?>
+            <div class="modal-dialog modal-sm">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title">OPCIONES DE IMPRESIÓN</h2>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <h4 class="page-header-form" style="margin: 0 0 5px 0 !important;">Toma PAP y Resultado en A5:</h4>
+                      <button type="button" class="btn btn-success  btn-block" onclick="open_pdfsinvalor('<?php echo $_POST['idSoli']?>');">Imprimir</button>
+                      <h4 class="page-header-form" style="margin: 15px 0 5px 0 !important;">Resultado en A4:</h4>
+                      <button type="button" class="btn btn-success  btn-block" onclick="open_pdfresultot('<?php echo $_POST['idSoli']?>','I');">Imprimir</button>
+                    </div>
+					<?php 
+						$rsSPAP = $pap->get_datosSolicitud($_POST['idSoli']);
+						if($rsSPAP[0]['id_estadoreg'] == "4"){
+					?>
+                    <div class="col-sm-12">
+					<br/>
+						<h4 class="page-header-form" style="margin: 0 0 5px 0 !important;">Entrega a paciente:</h4>
+						<address>
+							<strong>Profesional:</strong><br>
+							<?php echo $rsSPAP[0]['nombre_rsprofnotif'] ?><br>
+							<strong>Fecha:</strong><br>
+							<?php echo $rsSPAP[0]['fec_entregapac'] ?><br>
+							<strong>Detalle:</strong><br>
+							<?php echo $rsSPAP[0]['nom_tiponotif'] ?>.<br>
+							<?php echo nl2br($rsSPAP[0]['descrip_notif']) ?>
+						</address>
+                    </div>
+					<?php 
+						}
+					?>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-default btn-block" type="button" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Cerrar Ventana</button>
+                </div>
+              </div>
+            </div>
+            <?php
+            break;
+            case "SHOW_DETCANTIDADESENVIO":
+            $idEnvio = (int) $_POST['txtIdEnv'];
+            $rsE = $pap->get_datosEnvio($idEnvio);
+            ?>
+            <div class="box box-primary">
+              <div class="box-body box-profile">
+                <h3 class="profile-username text-center"><?php echo $rsE[0]['nro_papenv'] . "-" . $rsE[0]['anio_papenv'];?></h3>
+                <p class="text-muted text-center"><?php echo $rsE[0]['nom_depen'];?></p>
+                <ul class="list-group list-group-unbordered">
+                  <li class="list-group-item">
+                    <b>Total muestras</b> <span id="txtCantEnv" class="pull-right badge bg-blue"><?php echo $rsE[0]['cnt_solienvtot'];?></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Adecuadas</b> <span id="txtCantAcep" class="pull-right badge bg-green"><?php echo $rsE[0]['cnt_soliaceptada'];?></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Por subsanar</b> <span id="txtCantMod" class="pull-right badge bg-yellow"><?php echo $rsE[0]['cnt_solipormodif'];?></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Rechazados</b> <span id="txtCantRec" class="pull-right badge bg-red"><?php echo $rsE[0]['cnt_solirechazada'];?></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>No conformidad</b> <span id="txtCantRec" class="pull-right badge"><?php echo $rsE[0]['cnt_solinoconfor'];?></span>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Entregado a Paciente</b> <span id="txtCantRec" class="pull-right badge bg-green"><?php echo $rsE[0]['cnt_solinotif'];?></span>
+                  </li>
+                </ul>
+                <button type="button" class="btn btn-default btn-block" onclick="back()"><i class="glyphicon glyphicon-log-out"></i> Regresar</button>
+              </div>
+            </div>
+            <?php
+            break;
+            case 'GET_SHOW_EXISTENROLABSINRESULTADO';
+            $rs = $pap->get_datosExisteIdLabSinResultadoPorNroRegistroLab($_POST['nroRegLab'],$_POST['anioRegLab']);
+            $nr = count($rs);
+            if ($nr > 0) {
+              $datos = array(
+                0 => $rs[0]['id_papsoli'],
+                1 => $rs[0]['nro_reglab'],
+                2 => $rs[0]['anio_reglab'],
+              );
+              echo json_encode($datos);
+            } else {
+              $datos = array(
+                0 => ''
+              );
+              echo json_encode($datos);
+            }
+            break;
+    case 'GET_SHOW_INDICADOR_TOTAL';
+		$rs = $pap->get_repDatosIndiDirisPorAnio($_POST['anio'],$_POST['mes'],$_POST['id_ris'],$_POST['id_dependencia'],$_POST['id_estado']);
+		$nr = count($rs);
+		//print_r($rs);
+		//exit();
+		if ($nr > 0) {
+              $datos = array(
+                0 => $rs[0]['muestra'],
+                1 => $rs[1]['muestra'],
+                2 => $rs[2]['muestra'],
+				3 => $rs[3]['muestra'],
+				4 => $rs[4]['muestra'],
+				5 => $rs[5]['muestra'],
+				6 => $rs[6]['muestra'],
+				7 => $rs[7]['muestra'],
+				8 => $rs[8]['muestra'],
+				9 => $rs[9]['muestra'],
+				10 => $rs[10]['muestra'],
+				11 => $rs[11]['muestra'],
+				12 => $rs[12]['muestra'],
+				13 => $rs[13]['muestra'],
+				14 => $rs[14]['muestra'],
+				15 => $rs[15]['muestra'],
+				16 => $rs[16]['muestra']
+              );
+			  echo json_encode($datos);
+		} else {
+              $datos = array(
+                0 => 0,
+                1 => 0,
+                2 => 0,
+				3 => 0,
+				4 => 0,
+				5 => 0,
+				6 => 0,
+				7 => 0,
+				8 => 0,
+				9 => 0,
+				10 => 0,
+				11 => 0,
+				12 => 0,
+				13 => 0,
+				14 => 0,
+				15 => 0,
+				16 => 0
+              );
+			  echo json_encode($datos);
+        }
+	break;
+}
+?>

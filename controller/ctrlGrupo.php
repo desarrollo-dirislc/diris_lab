@@ -31,6 +31,12 @@ function to_pg_array($set) {
 }
 
 switch ($_POST['accion']) {
+  case 'GET_SHOW_DATOGRUPO':
+  $rs = $g->get_datoGrupoPorId($_POST['idGrupo']);
+  echo json_encode($rs);
+  exit();
+  break;
+
   case 'POST_ADD_REGGRUPO':
   if($_POST['txtIdGrupo'] == "0"){
     $accion = 'C';

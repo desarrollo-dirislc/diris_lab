@@ -31,6 +31,15 @@ class Grupo {
   }
 
 
+  public function get_datoGrupoPorId($idGrupo) {
+    $this->db->getConnection();
+    $aparam = array($idGrupo);
+    $this->sql = "Select id_grupo, descrip_grupo, estado From tbl_grupo Where id_grupo=$1";
+    $this->rs = $this->db->query_params($this->sql, $aparam);
+    $this->db->closeConnection();
+    return $this->rs;
+  }
+
   public function get_listaGrupoActivo() {
     $this->db->getConnection();
     $this->sql = "Select g.id_grupo, g.descrip_grupo From tbl_grupo g Where g.estado=1";

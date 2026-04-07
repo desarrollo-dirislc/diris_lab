@@ -33,11 +33,15 @@ $frm_origen = $_GET['ori'];
 if($frm_origen == "LR"){
 	$nro_atencion = $rsA[0]['nro_atencion_manual'];
 } else {
-	if($rsA[0]['id_tipo_genera_correlativo'] == "1"){
-		$nro_atencion = $rsA[0]['nro_atencion'] . "-". $rsA[0]['anio_atencion'];
-	} else {
-		$nro_atencion = substr($rsA[0]['nro_atencion'], 0, 6).substr($rsA[0]['nro_atencion'],6);
-	}
+	//if(!empty($rsA[0]['nro_atencion'])){
+		if($rsA[0]['id_tipo_genera_correlativo'] == "1"){
+			$nro_atencion = $rsA[0]['nro_atencion'] . "-". $rsA[0]['anio_atencion'];
+		} else {
+			$nro_atencion = substr($rsA[0]['nro_atencion'], 0, 6).substr($rsA[0]['nro_atencion'],6);
+		}
+	//} else {
+	//	$nro_atencion = $rsA[0]['nro_atencion_manual'];
+	//}
 }
 ?>
 <div class="container-fluid">
@@ -45,7 +49,7 @@ if($frm_origen == "LR"){
     <div class="panel-heading">
       <div class="row">
 		<div class="col-sm-6">
-			<h3 class="panel-title"><strong>REGISTRAR O MODIFICAR RESULTADOS <?php echo ($frm_origen <> 'deri') ? '' : " - ATENCION N°" . $nro_atencion?></strong></h3>
+			<h3 class="panel-title"><strong>REGISTRAR O MODIFICAR RESULTADOS - ATENCION N°<?php echo $nro_atencion?></strong></h3>
 		</div>
 		<div class="col-sm-6 text-right">
 			<h3 class="panel-title"><a href="#" onclick="event.preventDefault(); open_ayuda()">Ayuda <i class="fa fa-question-circle-o" aria-hidden="true"></i></a></h3>
@@ -166,7 +170,7 @@ if($frm_origen == "LR"){
 						<?php 
 							if($_GET['ori'] <> "LR"){
 						?>
-							<button type="button" class="btn btn-warning btn-xs" onclick="imprime_resultado_unido_check('<?php echo $idAtencion?>');"><i class="fa fa-file-text-o"></i></button><br/>
+							<button type="button" class="btn btn-warning btn-xs" onclick="imprime_resultado_unido_check('<?php echo $idAtencion?>','<?php echo $id_producto?>');"><i class="fa fa-file-text-o"></i></button><br/>
 						<?php 
 							}
 						?>
@@ -661,7 +665,7 @@ if($frm_origen == "LR"){
 					if (isset($id_estado_ing_resul)) {
 						if($id_estado_ing_resul <> 4) { 
 					?>
-					  <!--<button class="btn btn-primary btn-lg" id="btn-submit-proc" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Espere" data-done-text="<i class='fa fa-save'></i> Guardar" onclick="save_atencion('I')"><i class="fa fa-save"></i> Guardar</button> -->
+					  <button class="btn btn-primary btn-lg" id="btn-submit-proc" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Espere" data-done-text="<i class='fa fa-save'></i> Guardar" onclick="save_atencion('I')"><i class="fa fa-save"></i> Guardar</button>
 					<?php } ?>
 					  <button class="btn btn-success btn-lg" id="btn-submit" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Espere" data-done-text="<i class='fa fa-save'></i> Guardar" onclick="save_atencion('ITV')"><i class="fa fa-save"></i> <i class="fa fa-thumbs-up"></i> Guardar y validar</button>
 					<?php }
@@ -1086,7 +1090,7 @@ function imprime_resultado_area(idaten, iddep, idprod) {
   eval("page" + id + " = window.open(urlwindow, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=1,menubar=0,resizable=0,width=780,height=600,left = '+Xpos+',top = '+Ypos);");
 }
 
-function imprime_resultado_unido_check(idaten) {
+function imprime_resultado_unido_check(idaten, default_producto) {
 	if ($('input.check_atencion_' + idaten).is(':checked')) {
 	  var id_producto = [];
 	  $.each($('input.check_atencion_' + idaten), function() {
@@ -1094,6 +1098,8 @@ function imprime_resultado_unido_check(idaten) {
 			id_producto.push($(this).val());
 		}
 	  });
+	} else if (default_producto) {
+	  var id_producto = default_producto;
 	} else {
 	  var id_producto = '';
 	}

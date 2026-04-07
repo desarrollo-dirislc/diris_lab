@@ -75,8 +75,7 @@ function buscar_datos_personales(origen){
 	  } else if(datos[0] == "C"){ //Consulta reniec no disponible
 		$("#txtIdPer").val('0');
 		showMessage(datos[1], "error");
-		//habilita_datos_personales_y_hc_focus();
-		//showMessage("El servicio de consulta RENIEC no está disponible, por favor ingrese los datos manualmente...", "error");
+		habilita_datos_personales_y_hc_focus();
 		
 	  } else if((datos[4] == null) || (datos[4] == "")){
 		$("#txtIdPer").val('0');

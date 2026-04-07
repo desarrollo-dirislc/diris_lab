@@ -139,6 +139,27 @@ function buscar_datos() {
   $("#tblAtencion").dataTable().fnDraw()
 }
 
+function open_editar(idGrupo) {
+  $.ajax({
+    url: '../../controller/ctrlGrupo.php',
+    type: 'POST',
+    data: { accion: 'GET_SHOW_DATOGRUPO', idGrupo: idGrupo },
+    dataType: 'json',
+    success: function(data) {
+      if (data && data.length > 0) {
+        var row = data[0];
+        document.frmGrupo.txtIdGrupo.value = row['id_grupo'];
+        document.frmGrupo.txtDescGrupo.value = row['descrip_grupo'];
+        $("#txtIdEstGrupo").val(row['estado']).prop('disabled', false);
+        $('#showGrupoModal').modal({ show: true, backdrop: 'static', focus: true });
+        $('#showGrupoModal').on('shown.bs.modal', function() {
+          $("#txtDescGrupo").trigger('focus');
+        });
+      }
+    }
+  });
+}
+
 function reg_grupo() {
   document.frmGrupo.txtIdGrupo.value = '0';
   document.frmGrupo.txtDescGrupo.value = '';

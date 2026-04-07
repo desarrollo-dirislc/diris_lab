@@ -127,7 +127,7 @@ switch ($_POST['accion']) {
   <?php
   break;
   case 'GET_SHOW_COMPONENTEPORIDPRODGRUPO':
-  $rs = $p->get_datosComponentePorIdGrupoProd($_POST['id_productogrupo'], 0, $_POST['id_metodo']);
+  $rs = $p->get_datosComponentePorIdGrupoProd($_POST['id_productogrupo'], 0, isset($_POST['id_metodo']) ? $_POST['id_metodo'] : '');
   $nr = count($rs);
   ?>
   <div class="table-responsive">

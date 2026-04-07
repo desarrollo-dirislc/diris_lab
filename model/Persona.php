@@ -11,6 +11,15 @@ class Persona {
     $this->db = new ConectaDb();
     $this->rs = array();
   }
+  
+  public function post_reg_persona($param) {
+    $this->db->getConnection();
+    $aparam = array($param[0]['accion'], $param[0]['id'], $param[0]['id_atencion'], $param[0]['datos'], $param[0]['userIngreso']);
+    $this->sql = "select sp_crud_persona($1,$2,$3,$4,$5);";
+    $this->rs = $this->db->query_params($this->sql, $aparam);
+    $this->db->closeConnection();
+    return $this->rs[0][0];
+  }
 
   public function get_datosDetallePersona($optRep, $tipDocPer, $nroDoc) {
     $conet = $this->db->getConnection();

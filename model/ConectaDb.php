@@ -6,8 +6,8 @@ class ConectaDb {
     var $rs = null;
 
     function __construct() {
-        $this->srv = '10.0.0.3';
-          $this->db = 'pe_diris_slab_test';
+        $this->srv = 'srvdiris';
+          $this->db = 'pe_diris_slab_dev';
           $this->user = 'usr_lab';
           $this->pwd = 'lab@12345';
     }
@@ -35,7 +35,7 @@ class ConectaDb {
         $this->rs = $l;
         return $this->rs;
     }
-
+	
     public function query_assoc($sql) {
         $l = array();
         $rs = pg_query($this->cn, $sql);
@@ -70,14 +70,8 @@ class ConectaDb {
         return count($this->rs);
     }
 
-    // public function closeConnection() {
-    //     $this->cn . pg_close();
-    // }
-    public function closeConnection(): void {
-    if ($this->cn) {
-        pg_close($this->cn);
-        $this->cn = null;
+    public function closeConnection() {
+        $this->cn . pg_close();
     }
-}
 
 }

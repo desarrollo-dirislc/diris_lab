@@ -81,7 +81,7 @@ $lab = new Lab();
             <div class="col-sm-3">
               <label for="txt_bus_id_dependencia_clasi"><small>Dependencia origen:</small></label>
               <?php $rsD = $d->get_listaDepenInstitucion(); ?>
-              <select name="txt_bus_id_dependencia_clasi" id="txt_bus_id_dependencia_clasi" class="form-control" style="width: 100%" onclick="nueva_busqueda();">
+              <select name="txt_bus_id_dependencia_clasi" id="txt_bus_id_dependencia_clasi" class="form-control" style="width: 100%" onchange="nueva_busqueda();">
                 <option value="0" selected>-- TODOS --</option>
                 <?php
                 foreach ($rsD as $row) {
@@ -92,7 +92,7 @@ $lab = new Lab();
             </div>
             <div class="col-sm-2">
               <label>&nbsp;</label>
-              <button type="button" class="btn btn-info btn-sm btn-block" id="btn_bus_pendiente" onchange="nueva_busqueda();">Buscar</button>
+              <button type="button" class="btn btn-info btn-sm btn-block" id="btn_bus_pendiente" onclick="nueva_busqueda();">Buscar</button>
             </div>
           </div>
         </form>

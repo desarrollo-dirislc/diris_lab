@@ -46,7 +46,7 @@ $rsA = $at->get_datosAtencion($idAtencion);
 //print_r($rsA);
 //exit();
 $codeContents ="http://app1.dirislimacentro.gob.pe/labs-result/?p=".md5($rsA[0]['id_dependencia'])."&valid=".$valini.".".md5($idAtencion).".".$valfin;
-$tempDir = ''; //EXAMPLE_TMP_SERVERPATH;
+$tempDir = __DIR__ . '/'; //EXAMPLE_TMP_SERVERPATH;
 $fileName = 'qr/qr.jpg';
 $outerFrame = 4;
 $pixelPerPoint = 4;
